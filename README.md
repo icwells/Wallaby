@@ -9,20 +9,7 @@ Download the repository:
 
 git clone https://github.com/icwells/Wallaby.git
 
-## Dependencies:
-Python3 
-FastQC v0.11.3 
-Trimmomatic v0.36 
-ABySS 2.0.2 
-
-### For Local Alignment:
-Kiwi v0.2 or above
-MySQL 
-Cython 
-NCBI Blast+ 2.2.31+ 
-usearch v10.0.240 
-
-To download the Kiwi repository:
+### For Local Alignment download the Kiwi repository:
 
 git clone https://github.com/icwells/Kiwi.git
 
