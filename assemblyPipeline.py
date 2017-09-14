@@ -64,7 +64,7 @@ def readSum(archive, summ):
 
 def parseQuality(quals, outpath):
 	# Checks FastQC output and determines if trimming is necessary
-	print("\tExamining FastQC reports...")
+	print("\n\tExamining FastQC reports...")
 	afails = []
 	trim = False
 	for i in quals:
@@ -84,7 +84,6 @@ def parseQuality(quals, outpath):
 		print("\tTrim adapters from the following files:")
 		for i in afails:
 			print("\t\t" + i)
-		quit()
 	return trim
 
 #-----------------------------------------------------------------------------
