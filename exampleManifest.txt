@@ -1,0 +1,9 @@
+<path to forward read>	batch_name1	sample_name1
+<path to reverse read>	batch_name1	sample_name1
+<path to forward read>	batch_name1	sample_name2
+<path to reverse read>	batch_name1	sample_name2
+
+<path to forward read>	batch_name2	sample_name1
+<path to reverse read>	batch_name2	sample_name1
+<path to forward read>	batch_name2	sample_name2
+<path to reverse read>	batch_name2	sample_name2
