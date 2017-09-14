@@ -217,7 +217,7 @@ help = "Resume pipeline from blast/ublast.")
 			assemble = True
 	if assemble == True:
 		if args.align == False:
-			contigs = abyss(fastqs, outpath, conf["cpu"], conf["k"], startdir, args.align)
+			contigs = abyss(fastqs, outpath, conf["cpu"], conf["k"], startdir)
 		elif args.align == True:
 			# Assemble contig paths
 			contigs = []
