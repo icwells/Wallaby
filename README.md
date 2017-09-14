@@ -9,15 +9,13 @@ Download the repository:
 
 git clone https://github.com/icwells/Wallaby.git
 
-No installation is necessary.
-
-##Dependencies:
+###Dependencies:
 Python3
 FastQC v0.11.3
 Trimmomatic v0.36
 ABySS 2.0.2
 
-###For Local Alignment:
+####For Local Alignment:
 Kiwi v0.2 or above
 MySQL
 Cython
