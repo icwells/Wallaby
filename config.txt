@@ -1,7 +1,7 @@
 ### Wallaby Virus Assemby Pipeline Settings ###
 
 # General Settings
-	threads = 4
+	threads = 1
 	# Length of k-mers for ABYSS and default minlen for trimmomatic
 	k = 64
 
@@ -11,7 +11,7 @@
 	
 # Kiwi Settings
 	# Path to database directory
-	databases = /media/yitzhak/Data1/viralDB/blastdb
+	databases = 
 	# MySQL username
 	username = root
 
