@@ -4,6 +4,7 @@ change headers to "sampleID_contig#_lt_seqlength"'''
 from collections import OrderedDict
 import argparse
 import os
+import re
 
 def printContigs(outpath, fasta, circ):
 	# Prints sorted fasta to output files
@@ -12,12 +13,13 @@ def printContigs(outpath, fasta, circ):
 		with open(outpath + "_all_contigs_sort.fasta", "w") as al:
 			for i in fasta:
 				# Write remaining sequences
-				al.write(">" + i + "\n" + fasta[i] + "\n")
+				head = i.replace("~", "_")
+				al.write(">" + head + "\n" + fasta[i] + "\n")
 				if len(fasta[i]) >= 250:
-					min250.write(">" + i + "\n" + fasta[i] + "\n")
+					min250.write(">" + head + "\n" + fasta[i] + "\n")
 		for i in circ:
 			if len(circ[i]) >= 250:
-				min250.write(i + circ[i] + "\n")
+				min250.write(i.replace("~", "_") + circ[i] + "\n")
 	print("\tFinished.\n")	
 
 def slicer(seq, n):
@@ -46,7 +48,7 @@ def circularSeqs(fasta, outpath):
 				L2 = len(end)
 				if L3 > 2 and beg[:L2] == end:
 					# Mark circular contigs, write to fasta and stat file
-					newid = (">{}_cir_{}\n").format(i, L1)
+					newid = (">{}_cir_{}\n").format(i, L1).replace("~", "_")
 					outfile.write(newid + beg + "\n")
 					outstat.write((i +"\t{}\t{}\t{}\t{}\n").format(L3, L1, L2, n))
 					circ[newid] = beg
@@ -55,19 +57,17 @@ def circularSeqs(fasta, outpath):
 					outstat.write((i +"\t{}\t{}\t0\t{}\n").format(L3, L2, n))
 	return circ
 
-def sortFasta(inpath):
+def sortFasta(infile, filename):
 	# Saves input fasta as a sorted dictionary
 	print("\n\tSorting contigs...")
 	seq = ""
 	save = False
 	fa = {}
 	fasta = OrderedDict()
-	# Isolate library name from file name
-	filename = inpath[inpath.rfind("/")+1:inpath.find(".")]
-	filename = filename.replace("_", ".")
-	filename = filename.replace("-", ".")
-	print(filename)
-	with open(inpath, "r") as infile:
+	# Temporarily remove dashes and underscores
+	filename = filename.replace("_", "~")
+	filename = filename.replace("-", "~")
+	with open(infile, "r") as infile:
 		for line in infile:
 			line = line.strip()
 			if line[0] == ">":
@@ -98,13 +98,21 @@ This is free software, and you are welcome to redistribute it under certain \
 conditions.")
 	parser.add_argument("i", help = "Path to input fasta file.")
 	args = parser.parse_args()
-	# Determine output name
 	infile = args.i
-	outdir = infile[:infile.rfind(".")+1] + "Sorted/"
-	outpath = outdir + infile[infile.rfind("/"):infile.rfind(".")]
+	# Isolate filename
+	f = infile[infile.rfind("/")+1:]
+	if "-" in f:
+		# Remove stage number from ABySS assemblies
+		splt = re.split(r"-\d\.", f)
+		filename = splt[0]
+	else:
+		filename = filename[:filename.rfind(".")]
+	# Determine output name
+	outdir = infile[:infile.rfind("/")+1] + filename + "Sorted/"
+	outpath = outdir + filename
 	if not os.path.isdir(outdir):
 		os.mkdir(outdir)
-	fasta = sortFasta(args.i)
+	fasta = sortFasta(args.i, filename)
 	circ = circularSeqs(fasta, outpath)
 	printContigs(outpath, fasta, circ)
 
