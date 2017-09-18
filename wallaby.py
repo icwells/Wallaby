@@ -72,7 +72,7 @@ def sort(contigs, path, align):
 			fasta = sortFasta(i)
 			circ = circularSeqs(fasta, outpath)
 			printContigs(outpath, fasta, circ)
-		queries.append(outpath + "_all_min250bp.fasta")
+		queries.append(outpath + "_min250bp.fasta")
 	return queries	
 
 def inputDict(manifest):
