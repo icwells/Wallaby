@@ -69,7 +69,7 @@ def sort(contigs, path, align):
 			# Skip sorting if resuming from Blast
 			if not os.path.isdir(outdir):
 				os.mkdir(outdir)
-			fasta = sortFasta(i)
+			fasta = sortFasta(i, name)
 			circ = circularSeqs(fasta, outpath)
 			printContigs(outpath, fasta, circ)
 		queries.append(outpath + "_min250bp.fasta")
