@@ -182,7 +182,7 @@ three tab separated columns: paths to fastqs, batch name \
 (all reads for a sample set), sample name (PE reads).")
 	parser.add_argument("-o", help = "Path to output directory. All output \
 will be written here.")
-	parser.add_argument("--abyss", action = "store_true",
+	parser.add_argument("--abyss", action = "store_true", default = False,
 help = "Runs ABySS (SPAdes is run in metagenomic mode by default).")
 	parser.add_argument("--noqc", action = "store_true", 
 help = "Skip FastQC and Trimmomatic.")
