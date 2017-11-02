@@ -60,16 +60,15 @@ def blast(queries, conf):
 def sort(contigs, path, align):
 	# Calls filterMetagenomicSequences.py
 	queries = []
-	for i in contigs:
+	for i in contigs.keys():
 		# Make outdirs and file prefixes
-		name = i[i.rfind("/")+1:i.rfind("-")]
-		outdir = path + name + "-Sorted/"
-		outpath = outdir + name
+		outdir = path + i + "-Sorted/"
+		outpath = outdir + i
 		if align == False:
 			# Skip sorting if resuming from Blast
 			if not os.path.isdir(outdir):
 				os.mkdir(outdir)
-			fasta = sortFasta(i, name)
+			fasta = sortFasta(contigs[i], i)
 			circ = circularSeqs(fasta, outpath)
 			printContigs(outpath, fasta, circ)
 		queries.append(outpath + "_min250bp.fasta")
@@ -183,12 +182,14 @@ three tab separated columns: paths to fastqs, batch name \
 (all reads for a sample set), sample name (PE reads).")
 	parser.add_argument("-o", help = "Path to output directory. All output \
 will be written here.")
+	parser.add_argument("--abyss", action = "store_true",
+help = "Runs ABySS (SPAdes is run in metagenomic mode by default).")
 	parser.add_argument("--noqc", action = "store_true", 
 help = "Skip FastQC and Trimmomatic.")
 	parser.add_argument("--noblast", action = "store_true",
 help = "Ublast/Blast will not be run on sorted contigs.")
-	parser.add_argument("--blast", default = False, action = "store_true",
-help = "Runs blast on sorted contigs (ublast is run by default).")
+	parser.add_argument("--ublast", default = False, action = "store_true",
+help = "Runs ublast on sorted contigs (blast is run by default).")
 	parser.add_argument("--align", action = "store_true",  default = False,
 help = "Resume pipeline from blast/ublast.")
 	args = parser.parse_args()
@@ -217,21 +218,29 @@ help = "Resume pipeline from blast/ublast.")
 			assemble = True
 	if assemble == True:
 		if args.align == False:
-			contigs = abyss(fastqs, outpath, conf["cpu"], conf["k"], startdir)
+			if args.abyss:
+				contigs = assembly(fastqs, outpath, conf["cpu"], conf["k"], startdir)
+			else:
+				contigs = metaSPAdes(fastqs, outpath, conf["cpu"])
 		elif args.align == True:
 			# Assemble contig paths
-			contigs = []
-			for batch in fastqs:
-				outdir = outpath + "abyss-" + batch + "/"
-				contigs.append(outdir + batch + "-8.fa")
+			contigs = {}
+			if args.abyss:
+				for batch in fastqs:
+					outdir = outpath + "abyss-" + batch + "/"
+					contigs[batch] = outdir + batch + "-8.fa"
+			else:
+				for batch in fastqs:
+					outdir = outpath + "spades-" + batch + "/"
+					contigs[batch] = outdir + "contigs.fasta"
 	if contigs:
 		queries = sort(contigs, outpath, args.align)
 	if queries:
 		if args.noblast == False:
-			if args.blast == True:
-				blast(queries, conf)
-			else:
+			if args.ublast == True:
 				Ublast(queries, conf)
+			else:
+				blast(queries, conf)
 	print(("\tFinished pipeline.\n\tTotal runtime: {}.\n").format(
 										datetime.now()-starttime))
 

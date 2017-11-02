@@ -130,7 +130,7 @@ def trimmomatic(fastqs, outpath, cpu, trm):
 def abyss(fastqs, outpath, cpu, k, startdir):
 	# Calls ABYSS for each batch
 	print("\n\tRunning ABYSS assembler...")
-	contigs = []
+	contigs = {}
 	for batch in fastqs:
 		# Construct cammand and output directory for each batch
 		outdir = outpath + "abyss-" + batch + "/"
@@ -161,8 +161,35 @@ def abyss(fastqs, outpath, cpu, k, startdir):
 			ab = Popen(split(cmd))
 			ab.communicate()
 			# Append path to output file
-			contigs.append(outdir + batch + "-8.fa")
+			contigs[batch] = outdir + batch + "-8.fa"
 		except:
 			print(("\tError: {} failed ABYSS assembly.").format(batch))
 	os.chdir(startdir)
+	return contigs
+
+def metaSPAdes(fastqs, outpath, cpu):
+	# Calls MetaSPAdes fro each pair of reads
+	print("\n\tRunning SPAdes in metagomic assembly mode...")
+	contigs = {}
+	for batch in fastqs:
+		if len(fastqs[batch]) > 1:
+			print("\tError. MetaSPAdes can only run on single paired-end \
+libraries. Make sure there is only one pair of samples per batch.\n\tExiting.\n")
+			quit()
+		# Construct cammand and output directory for each batch
+		outdir = outpath + "spades-" + batch + "/"
+		if not os.path.isdir(outdir):
+			os.mkdir(outdir)
+		for sample in fastqs[batch]:
+			# Get file paths
+			s = fastqs[batch][sample]
+		cmd = ("python /opt/SPAdes/bin/spades.py --meta -t {} --pe1-1 {} --pe1-2 {} \
+-o {}").format(cpu, s[0], s[1], outdir)
+		try:
+			sp = Popen(split(cmd))
+			sp.comunicate()
+			# Append path to output file
+			contigs[batch] = outdir + "contigs.fasta"
+		except:
+			print(("\tError. {} failed SPAdes assembly.").format(batch))
 	return contigs
