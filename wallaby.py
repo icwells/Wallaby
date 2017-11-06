@@ -171,7 +171,7 @@ def config(noblast):
 def main():
 	starttime = datetime.now()
 	startdir = os.getcwd()
-	parser = argparse.ArgumentParser(description = "Wallaby version 0.3 (9/14/17) \
+	parser = argparse.ArgumentParser(description = "Wallaby version 0.4 (11/02/17) \
 script will run FastQC, Trimmomatic (if necessary), and ABYSS, sort ABYSS \
 assemblies, and call blastx and blastn. Only accepts paired end data. Copyright \
 2017 by Shawn Rupp, Varsani Lab, Biodesign Institute, Arizona State University. \
