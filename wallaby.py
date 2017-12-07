@@ -171,7 +171,7 @@ def config(noblast):
 def main():
 	starttime = datetime.now()
 	startdir = os.getcwd()
-	parser = argparse.ArgumentParser(description = "Wallaby version 0.4 (11/02/17) \
+	parser = argparse.ArgumentParser(description = "Wallaby version 0.5 (12/07/17) \
 script will run FastQC, Trimmomatic (if necessary), and ABYSS, sort ABYSS \
 assemblies, and call blastx and blastn. Only accepts paired end data. Copyright \
 2017 by Shawn Rupp, Varsani Lab, Biodesign Institute, Arizona State University. \
@@ -182,10 +182,12 @@ three tab separated columns: paths to fastqs, batch name \
 (all reads for a sample set), sample name (PE reads).")
 	parser.add_argument("-o", help = "Path to output directory. All output \
 will be written here.")
-	parser.add_argument("--abyss", action = "store_true", default = False,
-help = "Runs ABySS (SPAdes is run in metagenomic mode by default).")
+	parser.add_argument("--spades", action = "store_true", default = False,
+help = "Runs SPAdes in metagenomic mode(ABySS is run by default).")
 	parser.add_argument("--noqc", action = "store_true", 
 help = "Skip FastQC and Trimmomatic.")
+	parser.add_argument("--trim", action = "store_true", default = False,
+help = "Resumes pipeline from Trimmomatic step.")
 	parser.add_argument("--noblast", action = "store_true",
 help = "Ublast/Blast will not be run on sorted contigs.")
 	parser.add_argument("--ublast", default = False, action = "store_true",
@@ -208,7 +210,7 @@ help = "Resume pipeline from blast/ublast.")
 		os.mkdir(outpath)
 	if args.noqc == False:
 		# Perform quality control steps
-		quals = fastQC(fastqs, outpath, conf["cpu"])
+		quals = fastQC(fastqs, outpath, conf["cpu"], args.trim)
 		if quals:
 			trim = parseQuality(quals, outpath)
 		if trim == True:
@@ -219,7 +221,7 @@ help = "Resume pipeline from blast/ublast.")
 	if assemble == True:
 		if args.align == False:
 			if args.abyss:
-				contigs = assembly(fastqs, outpath, conf["cpu"], conf["k"], startdir)
+				contigs = abyss(fastqs, outpath, conf["cpu"], conf["k"], startdir)
 			else:
 				contigs = metaSPAdes(fastqs, outpath, conf["cpu"])
 		elif args.align == True:

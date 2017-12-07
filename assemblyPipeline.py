@@ -24,7 +24,7 @@ def minLen(inset, k):
 		# Set minlen to k
 		return inset + k 
 
-def fastQC(fastqs, outpath, cpu):
+def fastQC(fastqs, outpath, cpu, trim=False):
 	# Calls FastQC for all input files
 	print("\n\tRunning FastQC...\n")
 	quals = []
@@ -40,13 +40,16 @@ def fastQC(fastqs, outpath, cpu):
 			string += (string + " " + fastqs[batch][sample][0] + 
 						" " + fastqs[batch][sample][1])
 		# Call FastQC, save output directory
-		try:
-			fqc = Popen(split(string))
-			fqc.communicate()
+		if trim == False:
+			try:
+				fqc = Popen(split(string))
+				fqc.communicate()
+				quals.append(outdir)
+			except:
+				print("\tFastQC returned an error.")
+				quit()
+		else:
 			quals.append(outdir)
-		except:
-			print("\tFastQC returned an error.")
-			quit()
 	return quals
 
 def readSum(archive, summ):
