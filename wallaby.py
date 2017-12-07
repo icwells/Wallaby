@@ -220,7 +220,7 @@ help = "Resume pipeline from blast/ublast.")
 			assemble = True
 	if assemble == True:
 		if args.align == False:
-			if args.abyss:
+			if not args.spades:
 				contigs = abyss(fastqs, outpath, conf["cpu"], conf["k"], startdir)
 			else:
 				contigs = metaSPAdes(fastqs, outpath, conf["cpu"])
