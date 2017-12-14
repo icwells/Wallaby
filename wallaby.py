@@ -15,8 +15,8 @@ from filterMetagenomicSequences import *
 # Import blast scripts from Kiwi
 KIWI = "../Kiwi/bin/"
 sys.path.append(KIWI)
-#from blastSeqs import blastSeqs, ublast
-#from blastResults import readBlast, getSeqs, printOutput
+from blastSeqs import blastSeqs, ublast
+from blastResults import readBlast, getSeqs, printOutput
 
 def Ublast(queries, conf):
 	# Calls ublast pipeline and concatenates output
