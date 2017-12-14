@@ -15,8 +15,8 @@ from filterMetagenomicSequences import *
 # Import blast scripts from Kiwi
 KIWI = "../Kiwi/bin/"
 sys.path.append(KIWI)
-from blastSeqs import blastSeqs, ublast
-from blastResults import readBlast, getSeqs, printOutput
+#from blastSeqs import blastSeqs, ublast
+#from blastResults import readBlast, getSeqs, printOutput
 
 def Ublast(queries, conf):
 	# Calls ublast pipeline and concatenates output
@@ -75,7 +75,7 @@ def sort(contigs, path, align):
 	return queries	
 
 def inputDict(manifest):
-	# Saves information from manifest file
+	# Saves information from manifest file: {batch: sample: [R1, R2]}
 	fastqs = {}
 	with open(manifest, "r") as mani:
 		for line in mani:
@@ -171,7 +171,7 @@ def config(noblast):
 def main():
 	starttime = datetime.now()
 	startdir = os.getcwd()
-	parser = argparse.ArgumentParser(description = "Wallaby version 0.5 (12/07/17) \
+	parser = argparse.ArgumentParser(description = "Wallaby version 0.6 (12/14/17) \
 script will run FastQC, Trimmomatic (if necessary), and ABYSS, sort ABYSS \
 assemblies, and call blastx and blastn. Only accepts paired end data. Copyright \
 2017 by Shawn Rupp, Varsani Lab, Biodesign Institute, Arizona State University. \
@@ -188,6 +188,8 @@ help = "Runs SPAdes in metagenomic mode(ABySS is run by default).")
 help = "Skip FastQC and Trimmomatic.")
 	parser.add_argument("--trim", action = "store_true", default = False,
 help = "Resumes pipeline from Trimmomatic step.")
+	parser.add_argument("--assemble", action = "store_true", default = False,
+help = "Resumes pipeline from ABySS/SPAdes step.")
 	parser.add_argument("--noblast", action = "store_true",
 help = "Ublast/Blast will not be run on sorted contigs.")
 	parser.add_argument("--ublast", default = False, action = "store_true",
@@ -199,6 +201,8 @@ help = "Resume pipeline from blast/ublast.")
 	if args.align == True:
 		assemble = True
 		args.noqc = True
+	elif args.assemble == True:
+		args.trim = True
 	# Load settings and input files
 	conf = config(args.noblast)
 	fastqs = inputDict(args.i)
@@ -215,7 +219,7 @@ help = "Resume pipeline from blast/ublast.")
 			trim = parseQuality(quals, outpath)
 		if trim == True:
 			settings = minLen(conf["trim"], conf["k"])
-			assemble = trimmomatic(fastqs, outpath, conf["cpu"], settings)
+			fastqs, assemble = trimmomatic(fastqs, outpath, conf["cpu"], settings, args.assemble)
 		elif trim == False:
 			assemble = True
 	if assemble == True:

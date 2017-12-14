@@ -91,14 +91,16 @@ def parseQuality(quals, outpath):
 
 #-----------------------------------------------------------------------------
 
-def trimmomatic(fastqs, outpath, cpu, trm):
+def trimmomatic(fastqs, outpath, cpu, trm, notrim=False):
 	# Calls Trimmomatic on fastq files and edits fastq paths
 	print("\n\tRunning Trimmomatic...\n")
+	paired = {}
 	flist = []
 	cmd1 = ("java -jar /opt/Trimmomatic-0.36/trimmomatic-0.36.jar PE -phred33 -threads " 
 			+ cpu + " -trimlog ")
 	for batch in fastqs:
 		# Construct cammand and output directory for each batch
+		paired[batch] = {}
 		unpaired = outpath + "unpaired-" + batch + "/"
 		paired = outpath + "paired-" + batch + "/"
 		log = paired + "trimLog.txt"
@@ -112,23 +114,26 @@ def trimmomatic(fastqs, outpath, cpu, trm):
 			# Isolate file names
 			n1 = r1[r1.rfind("/")+1:]
 			n2 = r2[r2.rfind("/")+1:]
+			# Add new paths
+			paired[batch][sample] = [paired + n1, paired + n2]
 			string = (log + " " + r1 + " " + r2 + " " + paired + n1 + " " 
 					+ unpaired + n1 + " " + paired + n2 + " " + unpaired + n2)
-			# Call Trimmomatic
-			try:
-				tmm = Popen(split(cmd1 + string +  " " + trm))
-				tmm.communicate()
-				# Remove unpaired directory
-				shutil.rmtree(unpaired)
-			except:
-				flist.append(sample + " " + n1)
-				flist.append(sample + " " + n2)
+			if notrim == False:
+				# Call Trimmomatic
+				try:
+					tmm = Popen(split(cmd1 + string +  " " + trm))
+					tmm.communicate()
+					# Remove unpaired directory
+					shutil.rmtree(unpaired)
+				except:
+					flist.append(sample + " " + n1)
+					flist.append(sample + " " + n2)
 	if flist:
 		print("\nThe following files failed trimming:")
 		for i in flist:
 			print("\t" + i)
 		quit()
-	return True
+	return paired, True
 
 def abyss(fastqs, outpath, cpu, k, startdir):
 	# Calls ABYSS for each batch
