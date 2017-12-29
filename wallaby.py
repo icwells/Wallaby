@@ -231,14 +231,14 @@ help = "Resume pipeline from blast/ublast.")
 		elif args.align == True:
 			# Assemble contig paths
 			contigs = {}
-			if args.abyss:
-				for batch in fastqs:
-					outdir = outpath + "abyss-" + batch + "/"
-					contigs[batch] = outdir + batch + "-8.fa"
-			else:
+			if args.spades:
 				for batch in fastqs:
 					outdir = outpath + "spades-" + batch + "/"
 					contigs[batch] = outdir + "contigs.fasta"
+			else:
+				for batch in fastqs:
+					outdir = outpath + "abyss-" + batch + "/"
+					contigs[batch] = outdir + batch + "-8.fa"
 	if contigs:
 		queries = sort(contigs, outpath, args.align)
 	if queries:
